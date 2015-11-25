@@ -2,5 +2,6 @@ DS_Store
 RemoteSystemsTempFiles
 *.pyc
 *.class
-.metadata
-.recommenders
+.project
+.classpath
+/.recommenders/
