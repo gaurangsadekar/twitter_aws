@@ -1,7 +1,20 @@
+# Everything to ignore from Eclipse
+.metadata
+.gradle
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+
 DS_Store
 RemoteSystemsTempFiles
 *.pyc
 *.class
 .project
 .classpath
-/.recommenders/
+.recommenders

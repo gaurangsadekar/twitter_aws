@@ -12,24 +12,24 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.model.DeleteMessageBatchRequest;
 import com.amazonaws.services.sqs.model.DeleteMessageBatchRequestEntry;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
+import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 
 public class MessageReceiver {
-
-	public static void main(String[] args) throws Exception {
-
-		/*
-		 * The ProfileCredentialsProvider will return your [default] credential
-		 * profile by reading from the credentials file located at
-		 * (/Users/gaurang/.aws/credentials).
-		 */
-		AWSCredentials credentials = null;
+	
+	private static AWSCredentials credentials;
+	private static AmazonSQS sqs;
+	private final static String queueName = "tweet-queue";
+	
+	public static AWSCredentials getAWSCredentials() {
+		credentials = null;
 		try {
 			credentials = new ProfileCredentialsProvider("default").getCredentials();
 		} catch (Exception e) {
@@ -37,26 +37,32 @@ public class MessageReceiver {
 					+ "Please make sure that your credentials file is at the correct "
 					+ "location (/Users/gaurang/.aws/credentials), and is in valid format.", e);
 		}
-
-		AmazonSQS sqs = new AmazonSQSClient(credentials);
+		return credentials;
+	}
+	
+	public static AmazonSQS initSQS() {
+		sqs = new AmazonSQSClient(credentials);
 		Region usEast1 = Region.getRegion(Regions.US_EAST_1);
 		sqs.setRegion(usEast1);
+		return sqs;
+	}
+	
+	public static void processMessages (String queueName) throws JSONException {
+		String tweetQueueURL = sqs.getQueueUrl(queueName).getQueueUrl();
 
-		try {
-			String queueName = "tweet-queue";
-			String tweetQueueURL = sqs.getQueueUrl(queueName).getQueueUrl();
+		// Receive tweets from Queue
+		int maxNumberOfMessages = 10;
 
-			// Receive tweets from Queue
-			int maxNumberOfMessages = 10;
-
-			while (true) {
-				ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(tweetQueueURL)
-						.withMaxNumberOfMessages(maxNumberOfMessages);
-				List<Message> messages = sqs.receiveMessage(receiveMessageRequest).getMessages();
+		while (true) {
+			ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(tweetQueueURL)
+					.withMaxNumberOfMessages(maxNumberOfMessages);
+			List<Message> messages = sqs.receiveMessage(receiveMessageRequest).getMessages();
+			
+			if (!messages.isEmpty()) {
 				ExecutorService executor = Executors.newFixedThreadPool(maxNumberOfMessages);
 				for (Message message : messages) {
 					JSONObject tweet = new JSONObject(message.getBody());
-					Runnable tweetWorker = new TweetWorker(tweet);
+					Runnable tweetWorker = new TweetWorker(tweet, credentials);
 					executor.execute(tweetWorker);
 				}
 				try {
@@ -71,16 +77,46 @@ public class MessageReceiver {
 					executor.shutdownNow();
 					System.out.println("All threads forcefully shutdown");
 				}
-				// Delete the 10 messages that are processed
-//				List<DeleteMessageBatchRequestEntry> deleteEntries = new ArrayList<DeleteMessageBatchRequestEntry>();
-//				for (Message message : messages) {
-//					deleteEntries.add(
-//							new DeleteMessageBatchRequestEntry(message.getMessageId(), message.getReceiptHandle()));
-//				}
-//				DeleteMessageBatchRequest deleteRequest = new DeleteMessageBatchRequest(tweetQueueURL, deleteEntries);
-//				sqs.deleteMessageBatch(deleteRequest);
+				deleteQueueMessagesBatch(tweetQueueURL, messages);
 			}
+			else {
+				System.out.println("No messages, sleep the thread");
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+			}
+		
+		}
+	}
+	
+	public static void deleteQueueMessagesBatch(String queueURL, List<Message> messages) {
+		// Delete up to 10 messages that are processed
+		List<DeleteMessageBatchRequestEntry> deleteEntries = new ArrayList<DeleteMessageBatchRequestEntry>();
+		for (Message message : messages) {
+			deleteEntries.add(
+					new DeleteMessageBatchRequestEntry(message.getMessageId(), message.getReceiptHandle()));
+		}
+		DeleteMessageBatchRequest deleteRequest = new DeleteMessageBatchRequest(queueURL, deleteEntries);
+		sqs.deleteMessageBatch(deleteRequest);
+		System.out.println("Deleted Messages");
+	}
+	
+	public static void main(String[] args) throws Exception {
 
+		/*
+		 * The ProfileCredentialsProvider will return your [default] credential
+		 * profile by reading from the credentials file located at
+		 * (/Users/gaurang/.aws/credentials).
+		 */
+		credentials = getAWSCredentials();
+		sqs = initSQS();
+
+		try {
+			// process tweets from the queue
+			processMessages(queueName);
+			
 		} catch (AmazonServiceException ase) {
 			System.out.println("Caught an AmazonServiceException, which means your request made it "
 					+ "to Amazon SQS, but was rejected with an error response for some reason.");
