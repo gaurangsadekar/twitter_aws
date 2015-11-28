@@ -12,8 +12,6 @@ var config = {
 
 var aws = require('aws-sdk');
 aws.config.update({
-    accessKeyId: "AKIAIG4OW4BCIMCVM4EQ",
-    secretAccessKey: "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"
     region: 'us-east-1'
 });
 
@@ -26,7 +24,7 @@ app.use(bodyParser.json());
 
 
 app.post('/newtweet', function (req, res) {
-  console.log('New tweet from SNS. Yay!')
+  console.log('New tweet from SNS')
   // parse the request, get the tweet and emit it to the client, then send a thank you to SNS
   body = '';
   req.on('data', function(data) {
