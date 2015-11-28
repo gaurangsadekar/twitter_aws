@@ -10,7 +10,7 @@ Code for Assignment 2 of Cloud and Big Data.
 * Reads Tweets from the SQS Queue (The 'consumer' for SQS)
 * Uses a Thread Pool & Executor to get the sentiment of each tweet using the Alchemy API.
 * Adds the enriched data into DynamoDB
-* [TODO] Notifies the Server of Real-Time Tweets using SNS.
+* Notifies the Server of Real-Time Tweets using SNS.
 
 [TODO] - A Web Server to read the tweets from DynamoDB and service client requests via Sockets - (Node.js)
 
