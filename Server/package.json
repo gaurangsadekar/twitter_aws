@@ -1,0 +1,12 @@
+{
+  "name": "cloud_project_2",
+  "main": "server.js",
+  "author": "Gaurang",
+  "dependencies": {
+      "express": "*",
+      "socket.io": "*",
+      "body-parser": "*",
+      "aws-sdk": "*",
+      "querystring": "*"
+  }
+}

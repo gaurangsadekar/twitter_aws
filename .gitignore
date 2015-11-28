@@ -18,3 +18,4 @@ RemoteSystemsTempFiles
 .project
 .classpath
 .recommenders
+node_modules
