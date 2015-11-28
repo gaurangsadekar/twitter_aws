@@ -65,7 +65,7 @@ public class TweetWorker implements Runnable {
 		// hit up alchemy
 		boolean alchemySuccess = true;
 		try {
-			AlchemyAPI alchemy = AlchemyAPI.GetInstanceFromString(apiKey_lion);
+			AlchemyAPI alchemy = AlchemyAPI.GetInstanceFromString(apiKey_gmail);
 			Document doc = alchemy.TextGetTextSentiment(tweet.getString("text"));
 			if (doc != null) {
 				String sentimentType = doc.getElementsByTagName("type").item(0).getTextContent();
@@ -81,6 +81,9 @@ public class TweetWorker implements Runnable {
 			e.printStackTrace();
 		} catch (IOException e) {
 			System.out.println("unsupported language");
+			alchemySuccess = false;
+		} catch (NullPointerException e) {
+			System.out.println("Alchemy didn't return sentiment");
 			alchemySuccess = false;
 		}
 		return alchemySuccess;
