@@ -77,7 +77,7 @@ public class MessageReceiver {
 					executor.shutdownNow();
 					System.out.println("All threads forcefully shutdown");
 				}
-				deleteQueueMessagesBatch(tweetQueueURL, messages);
+				//deleteQueueMessagesBatch(tweetQueueURL, messages);
 			}
 			else {
 				System.out.println("No messages, sleep the thread");
