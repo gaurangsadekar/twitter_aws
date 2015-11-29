@@ -65,6 +65,9 @@ io.on('connection', function(socket) {
   iosocket = socket;
   console.log("connected");
   loadFromDynamo();
+  socket.on('gettrends', function(message) {
+    console.log(message.id);
+  });
 });
 
 var port = 5000;

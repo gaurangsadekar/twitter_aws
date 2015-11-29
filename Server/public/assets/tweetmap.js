@@ -107,3 +107,7 @@
 	             });
         markers.push(marker);
     };
+
+    function getTrendsById(geoid) {
+      socket.emit('gettrends', {id: geoid});
+    };

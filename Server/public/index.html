@@ -23,22 +23,33 @@
 	<button onclick="toggleHeatmap()">Toggle HeatMap</button>
 	<button onclick="changeGradient()">Change Gradient</button>
 	<button onclick="changeOpacity()">Change Opacity</button>
-<!--	
 	</br>
-	<h4>Filter by Keyword</h4>
+	<h4>Twitter Trends</h4>
 	
     <form id="filter" method="POST" action='#'>
-    <select id='keywords' name='keywords'>
-	<option value='love'>love</option>
-	<option value='trump'>trump</option>
-	<option value='football'>football</option>
-	<option value='tech'>tech</option>
-	<option value='india'>india</option>
+    <select id='trends' name='trends'>
+	<option value='23424848'>India</option>
+	<option value='23424977'>United States</option>
+	<option value='23424975'>United Kingdom</option>
+	<option value='23424936'>Russia</option>
+	<option value='23424781'>China</option>
+        <option value='23424748'>Australia</option>
+        <option value='24865670'>Africa</option>
+        <option value='23424942'>South Africa</option>
+        <option value='23424843'>Italy</option>
+        <option value='23424775'>Canada</option>
+        <option value='23424768'>Brazil</option>
+        <option value='24865673'>South America</option>
+        <option value='23424901'>Malaysia</option>
     </select>
-    <input type="submit" value="Filter">
+    <input type="button" value="Get Trends" onClick="getTrends()">
     </form>
--->
     <script src="/assets/tweetmap.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?libraries=visualization&callback=initMap"></script>
+    <script>
+      function getTrends() {
+        getTrendsById(document.getElementById('trends').value);
+      };
+    </script>
   </body>
 </html>
