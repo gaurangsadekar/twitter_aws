@@ -15,11 +15,7 @@ app.use(bodyParser.json());
 // get express router object
 var router = express.Router();
 var iosocket = null;
-aws.config.update({
-    accessKeyId: "AKIAIG4OW4BCIMCVM4EQ",
-    secretAccessKey: "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",
-    region: 'us-east-1'
-});
+
 
 app.get('/', function(req, res) {
   console.log('Hit from client')
