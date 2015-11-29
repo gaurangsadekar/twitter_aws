@@ -16,36 +16,37 @@
         position: absolute;
         height: 100%;
       }
+      #buttons {
+        position: absolute;
+        top: 675px;
+      }
       #side {
         position: absolute;
-        right: 0;
-        padding: 10px;
-        margin: 10px;
-	border: 0px solid #eee;
-	text-align: center;
+        top: 700px;
       }
       #addons {
         position: absolute;
-        top: 700px;
-        left: 10px;
+        right: 0px;
+        padding: 10px;
+        margin: 10px;
+        border: 0px solid #eee;
+        text-align: center;
       }
     </style>
   </head>
   <body>
     <div id="map" style="width:1100px;height:650px;"></div>
-    <button onclick="changeRadius()">Change radius</button>
-    <button onclick="toggleHeatmap()">Toggle HeatMap</button>
-    <button onclick="changeGradient()">Change Gradient</button>
-    <button onclick="changeOpacity()">Change Opacity</button>
-    </br>
+    <div id="buttons">
+      <button onclick="changeRadius()">Change radius</button>
+      <button onclick="toggleHeatmap()">Toggle HeatMap</button>
+      <button onclick="changeGradient()">Change Gradient</button>
+      <button onclick="changeOpacity()">Change Opacity</button>
+    </div>
     <div id="side">
+      <h4>Sentiment Analysis</h4>
       <p id="Positive"></p>
-      <br>
       <p id="Negative"></p>
-      <br>
       <p id="Neutral"></p>
-      <br>
-      <div id="Trends"></div>
     </div>
     <h4>Twitter Trends</h4>
     <div id="addons">
@@ -54,7 +55,6 @@
 	  <option value='23424848'>India</option>
 	  <option value='23424977'>United States</option>
 	  <option value='23424975'>United Kingdom</option>
-          <option value='23424748'>Australia</option>
           <option value='23424942'>South Africa</option>
           <option value='23424775'>Canada</option>
           <option value='23424768'>Brazil</option>
@@ -63,6 +63,7 @@
       </select>
       <input type="button" value="Get Trends" onClick="getTrends()">
       </form>
+      <div id ="Trends"></div>
     </div>
     <script src="/assets/tweetmap.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?libraries=visualization&callback=initMap"></script>

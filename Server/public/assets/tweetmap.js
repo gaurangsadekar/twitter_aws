@@ -116,10 +116,10 @@
 
     function viewTrends(trends) {
       if (trends != null) {
-        $('#side #Trends').text("");
-        $('#side #Trends').append("<h4>Trending Topics:</h4>");
+        $('#addons #Trends').text("");
+        $('#addons #Trends').append("<h4>Trending Topics:</h4>");
         for (i = 0; i < trends.length; i++) {
-          $('#side #Trends').append("<p>" + trends[i].name + "</p>");
+          $('#addons #Trends').append("<p>" + trends[i].name + "</p>");
         }
       }
     };
