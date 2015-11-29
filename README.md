@@ -12,7 +12,8 @@ Code for Assignment 2 of Cloud and Big Data.
 * Adds the enriched data into DynamoDB
 * Notifies the Server of Real-Time Tweets using SNS.
 
-[TODO] - A Web Server to read the tweets from DynamoDB and service client requests via Sockets - (Node.js)
+#### Web Server - Node.js
+A Web Server to read the tweets from DynamoDB, emit new tweets as they are received from SNS and service client requests via Sockets
 
 Developed by:
 
