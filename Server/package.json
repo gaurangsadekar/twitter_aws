@@ -7,6 +7,7 @@
       "socket.io": "*",
       "body-parser": "*",
       "aws-sdk": "*",
-      "querystring": "*"
+      "querystring": "*",
+      "twitter": "*"
   }
 }

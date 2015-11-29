@@ -1,4 +1,5 @@
 var express = require('express');
+var twitter = require('twitter');
 var aws = require('aws-sdk');
 var bodyParser = require('body-parser');
 
@@ -15,11 +16,17 @@ app.use(bodyParser.json());
 // get express router object
 var router = express.Router();
 var iosocket = null;
+aws.config.update({
+    accessKeyId: "AKIAIG4OW4BCIMCVM4EQ",
+    secretAccessKey: "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",
+    region: 'us-east-1'
+});
 
-
-app.get('/', function(req, res) {
-  console.log('Hit from client')
-  res.send("Hello From Server")
+var twit = new twitter ({
+  consumer_key: 'CLbQDiBRjNn1NGEE0wJ2yNtxb',
+  consumer_secret: 'sJRdATSUzFWYJ1F2Ko28iLcWAQpYOsRjEX3EE0OoWW4XHoNGIl',
+  access_token_key: '140911269-fETxwkzza6f4n0MX1j6Saf7btgV7Vd1OBWdJKjVr',
+  access_token_secret: 'yOkNGkoOvtqtNre0L0rsNyYhhlIltkRWHz5sWVLFsmWFj'
 });
 
 app.post('/newtweet', function (req, res) {
@@ -67,6 +74,19 @@ io.on('connection', function(socket) {
   loadFromDynamo();
   socket.on('gettrends', function(message) {
     console.log(message.id);
+    var params = {id: message.id};
+    twit.get('trends/place', params, function(err, payload, response) {
+      if (!err) {
+        //trend_topics = [];
+        // for (i = 0; i < payload.length; i++) {
+        //
+        // }
+        socket.emit('foundTweets', payload);
+      }
+      else {
+        console.log(err);
+      }
+    });
   });
 });
 
