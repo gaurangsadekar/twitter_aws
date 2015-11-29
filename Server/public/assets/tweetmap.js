@@ -1,4 +1,4 @@
-    var socket, map, heatmap, mapPoints, markers = [];
+    var socket, map, heatmap, mapPoints, positiveTweets = 0, negativeTweets = 0, neutralTweets = 0, markers = [];
 
     function initMap() {
       map = new google.maps.Map(document.getElementById('map'), {
@@ -22,18 +22,6 @@
       temp = getPoints();
       mapPoints = new google.maps.MVCArray(temp);
     }
-
-/*
-    function filterMapPoints() {
-      while(mapPoints.length) {
-         mapPoints.pop();
-      }
-      while(markers.length) {
-         var marker = markers.pop();
-         marker.setMap(null);
-      }
-    }
-*/
 
     function updateMapPoints(coordinates) {
       mapPoints.push(new google.maps.LatLng(coordinates[1], coordinates[0]));
@@ -89,16 +77,23 @@
         markSentiment(json_tweet);
         updateMapPoints(json_tweet.coordinates.coordinates);
       });
-    }
+      socket.on('foundtweets', function(trends) {
+        viewTrends(trends);
+      });
+    };
 
     function markSentiment(json_tweet) {
       var sentiment = json_tweet.sentimentType;
       var icon = "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
 	if (sentiment == "positive") {
           icon = "http://maps.google.com/mapfiles/ms/icons/green-dot.png";
+          positiveTweets = positiveTweets + 1;
 	} else if (sentiment == "negative") {
 	  icon = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
-	}
+          negativeTweets = negativeTweets + 1;
+	} else {
+          neutralTweets = neutralTweets + 1;
+        }
         var marker = new google.maps.Marker({
 		     position: {lat: json_tweet.coordinates.coordinates[1], lng: json_tweet.coordinates.coordinates[0]},
 		     map: map,
@@ -106,8 +101,25 @@
 		     title: json_tweet.text
 	             });
         markers.push(marker);
+        updateCounters();
     };
 
     function getTrendsById(geoid) {
       socket.emit('gettrends', {id: geoid});
+    };
+
+    function updateCounters() {
+      $('#side #Positive').text("Positive: " + positiveTweets);
+      $('#side #Negative').text("Negative: " + negativeTweets);
+      $('#side #Neutral').text("Neutral: " + neutralTweets);
+    };
+
+    function viewTrends(trends) {
+      if (trends != null) {
+        $('#side #Trends').text("");
+        $('#side #Trends').append("<h4>Trending Topics:</h4>");
+        for (i = 0; i < trends.length; i++) {
+          $('#side #Trends').append("<p>" + trends[i].name + "</p>");
+        }
+      }
     };

@@ -13,37 +13,57 @@
         padding: 0;
       }
       #map {
+        position: absolute;
         height: 100%;
+      }
+      #side {
+        position: absolute;
+        right: 0;
+        padding: 10px;
+        margin: 10px;
+	border: 0px solid #eee;
+	text-align: center;
+      }
+      #addons {
+        position: absolute;
+        top: 700px;
+        left: 10px;
       }
     </style>
   </head>
   <body>
     <div id="map" style="width:1100px;height:650px;"></div>
-	<button onclick="changeRadius()">Change radius</button>
-	<button onclick="toggleHeatmap()">Toggle HeatMap</button>
-	<button onclick="changeGradient()">Change Gradient</button>
-	<button onclick="changeOpacity()">Change Opacity</button>
-	</br>
-	<h4>Twitter Trends</h4>
-	
-    <form id="filter" method="POST" action='#'>
-    <select id='trends' name='trends'>
-	<option value='23424848'>India</option>
-	<option value='23424977'>United States</option>
-	<option value='23424975'>United Kingdom</option>
-	<option value='23424936'>Russia</option>
-	<option value='23424781'>China</option>
-        <option value='23424748'>Australia</option>
-        <option value='24865670'>Africa</option>
-        <option value='23424942'>South Africa</option>
-        <option value='23424843'>Italy</option>
-        <option value='23424775'>Canada</option>
-        <option value='23424768'>Brazil</option>
-        <option value='24865673'>South America</option>
-        <option value='23424901'>Malaysia</option>
-    </select>
-    <input type="button" value="Get Trends" onClick="getTrends()">
-    </form>
+    <button onclick="changeRadius()">Change radius</button>
+    <button onclick="toggleHeatmap()">Toggle HeatMap</button>
+    <button onclick="changeGradient()">Change Gradient</button>
+    <button onclick="changeOpacity()">Change Opacity</button>
+    </br>
+    <div id="side">
+      <p id="Positive"></p>
+      <br>
+      <p id="Negative"></p>
+      <br>
+      <p id="Neutral"></p>
+      <br>
+      <div id="Trends"></div>
+    </div>
+    <h4>Twitter Trends</h4>
+    <div id="addons">
+      <form id="filter" method="POST" action='#'>
+      <select id='trends' name='trends'>
+	  <option value='23424848'>India</option>
+	  <option value='23424977'>United States</option>
+	  <option value='23424975'>United Kingdom</option>
+          <option value='23424748'>Australia</option>
+          <option value='23424942'>South Africa</option>
+          <option value='23424775'>Canada</option>
+          <option value='23424768'>Brazil</option>
+          <option value='23424901'>Malaysia</option>
+          <option value='2295411'>Mumbai</option>
+      </select>
+      <input type="button" value="Get Trends" onClick="getTrends()">
+      </form>
+    </div>
     <script src="/assets/tweetmap.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?libraries=visualization&callback=initMap"></script>
     <script>

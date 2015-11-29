@@ -1,32 +1,32 @@
 var express = require('express');
-var twitter = require('twitter');
-var aws = require('aws-sdk');
-var bodyParser = require('body-parser');
-
 var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-
-// setup static content
-app.use(express.static(__dirname + "/public"));
-
-// parse application/json
-app.use(bodyParser.json());
-
-// get express router object
 var router = express.Router();
-var iosocket = null;
 
+var twitter = require('twitter');
 var twit = new twitter ({
-  consumer_key: 'CLbQDiBRjNn1NGEE0wJ2yNtxb',
-  consumer_secret: 'sJRdATSUzFWYJ1F2Ko28iLcWAQpYOsRjEX3EE0OoWW4XHoNGIl',
-  access_token_key: '140911269-fETxwkzza6f4n0MX1j6Saf7btgV7Vd1OBWdJKjVr',
-  access_token_secret: 'yOkNGkoOvtqtNre0L0rsNyYhhlIltkRWHz5sWVLFsmWFj'
+  consumer_key: 'Akvjrwhus5ZWoOqBIZ3YwzBnj',
+  consumer_secret: 'fmyAfDeeY97sBevcs8rVdxR5K4CyHWQ7IgFuYFh80BQZus3SVP',
+  access_token_key: '4313326185-gR8yb25anRBjUfPkOLyrJURut2pbFuhKwi6ZjSw',
+  access_token_secret: 'DifijsWlsxsvf3CiixfVgGUK7n6nxAvn2j0XGfEOIYJHx'
 });
 
+var aws = require('aws-sdk');
+aws.config.update({
+  accessKeyId: "AKIAIG4OW4BCIMCVM4EQ",
+  secretAccessKey: "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",
+  region: 'us-east-1'
+});
+
+var bodyParser = require('body-parser');
+app.use(bodyParser.json());
+
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+var iosocket = null;
+
+app.use(express.static(__dirname + "/public"));
+
 app.post('/newtweet', function (req, res) {
-  console.log('New tweet from SNS')
-  // parse the request, get the tweet and emit it to the client, then send a thank you to SNS
   var body = '';
   req.on('data', function(data) {
     body += data;
@@ -51,17 +51,17 @@ function loadFromDynamo() {
     if (err) {
       console.log(err);
     } else if (data) {
-      console.log('Last scan processed ' + data.ScannedCount + ' items: ');
+      console.log('Last Scan Processed ' + data.ScannedCount + ' items: ');
       for (var i = 0; i < data.Items.length; i++) {
         tweet = data.Items[i]['tweet']['S'];
         json_tweet = JSON.parse(tweet);
         iosocket.emit("mapdata", json_tweet);
       }
     } else {
-      console.log('*** Finished Scan ***');
+      console.log('Finished Scan');
     }
   });
-}
+};
 
 io.on('connection', function(socket) {
   iosocket = socket;
@@ -72,11 +72,9 @@ io.on('connection', function(socket) {
     var params = {id: message.id};
     twit.get('trends/place', params, function(err, payload, response) {
       if (!err) {
-        //trend_topics = [];
-        // for (i = 0; i < payload.length; i++) {
-        //
-        // }
-        socket.emit('foundTweets', payload);
+        trend_topics = payload[0];
+        trends = trend_topics.trends;
+        socket.emit('foundtweets', trends);
       }
       else {
         console.log(err);
@@ -86,7 +84,6 @@ io.on('connection', function(socket) {
 });
 
 var port = 5000;
-// start listening
 http.listen(process.env.PORT || port, function() {
     console.log('listening on 5000');
 });
