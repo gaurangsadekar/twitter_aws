@@ -1,20 +1,10 @@
 var express = require('express');
+var aws = require('aws-sdk');
 var bodyParser = require('body-parser');
 
 var app = express();
-
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-
-var config = {
-    PORT: 3000
-}
-
-var aws = require('aws-sdk');
-aws.config.update({
-    region: 'us-east-1'
-});
-
 
 // setup static content
 app.use(express.static(__dirname + "/public"));
@@ -22,11 +12,24 @@ app.use(express.static(__dirname + "/public"));
 // parse application/json
 app.use(bodyParser.json());
 
+// get express router object
+var router = express.Router();
+var iosocket = null;
+aws.config.update({
+    accessKeyId: "AKIAIG4OW4BCIMCVM4EQ",
+    secretAccessKey: "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",
+    region: 'us-east-1'
+});
+
+app.get('/', function(req, res) {
+  console.log('Hit from client')
+  res.send("Hello From Server")
+});
 
 app.post('/newtweet', function (req, res) {
   console.log('New tweet from SNS')
   // parse the request, get the tweet and emit it to the client, then send a thank you to SNS
-  body = '';
+  var body = '';
   req.on('data', function(data) {
     body += data;
   });
@@ -35,18 +38,14 @@ app.post('/newtweet', function (req, res) {
     message = JSON.parse(body);
     tweet = message['Message'];
     json_tweet = JSON.parse(tweet);
-    console.log(json_tweet.coordinates.coordinates);
-    console.log(json_tweet['text']);
+    socket.emit("mapdata", json_tweet);
   });
 
-  // socket goes here
   res.status(200);
-  res.send('thanks');
+  res.send('notification received');
 });
 
-
-
-function loadFromDynamo() {
+function loadFromDynamo(socket) {
   var dynamoDB = new aws.DynamoDB();
   var params = { TableName: 'tweets' };
 
@@ -57,9 +56,8 @@ function loadFromDynamo() {
       console.log('Last scan processed ' + data.ScannedCount + ' items: ');
       for (var i = 0; i < data.Items.length; i++) {
         tweet = data.Items[i]['tweet']['S'];
-        tweet = JSON.parse(tweet);
-        console.log(tweet['text']);
-        console.log(tweet.coordinates.coordinates);
+        json_tweet = JSON.parse(tweet);
+        socket.emit("mapdata", json_tweet);
       }
     } else {
       console.log('*** Finished Scan ***');
@@ -68,13 +66,13 @@ function loadFromDynamo() {
 }
 
 io.on('connection', function(socket) {
-    console.log('new user connected');
-    socket.emit("tweets:connected", {msg: "hello world from server"});
-    loadFromDynamo(socket);
-    //startListeningOnSNS(socket);
+  iosocket = socket;
+  console.log("connected");
+  loadFromDynamo(socket);
 });
 
+var port = 5000;
 // start listening
-http.listen(5000, function() {
+http.listen(process.env.PORT || port, function() {
     console.log('listening on 5000');
 });
