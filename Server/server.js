@@ -38,14 +38,14 @@ app.post('/newtweet', function (req, res) {
     message = JSON.parse(body);
     tweet = message['Message'];
     json_tweet = JSON.parse(tweet);
-    socket.emit("mapdata", json_tweet);
+    iosocket.emit("mapdata", json_tweet);
   });
 
   res.status(200);
   res.send('notification received');
 });
 
-function loadFromDynamo(socket) {
+function loadFromDynamo() {
   var dynamoDB = new aws.DynamoDB();
   var params = { TableName: 'tweets' };
 
@@ -57,7 +57,7 @@ function loadFromDynamo(socket) {
       for (var i = 0; i < data.Items.length; i++) {
         tweet = data.Items[i]['tweet']['S'];
         json_tweet = JSON.parse(tweet);
-        socket.emit("mapdata", json_tweet);
+        iosocket.emit("mapdata", json_tweet);
       }
     } else {
       console.log('*** Finished Scan ***');
@@ -68,7 +68,7 @@ function loadFromDynamo(socket) {
 io.on('connection', function(socket) {
   iosocket = socket;
   console.log("connected");
-  loadFromDynamo(socket);
+  loadFromDynamo();
 });
 
 var port = 5000;
