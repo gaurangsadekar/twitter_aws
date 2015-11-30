@@ -5,7 +5,7 @@ import boto3
 sqs = boto3.resource('sqs')
 
 # Some user defined keywords for filtering
-keywords = ['love','football','tech','paris','india', 'nba', 'basketball', 'thanks']
+keywords = ['news', 'media', 'india', 'nba', 'basketball', 'thanks', 'shit', 'crap']
 langs = ['en', 'fr', 'es', 'de', 'it', 'pt', 'ru', 'ar']
 
 class StreamTweetListener(StreamListener):

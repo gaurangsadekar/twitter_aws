@@ -34,6 +34,7 @@ public class TweetWorker implements Runnable {
 	
 	private final String apiKey_gmail = "3c592701a603462b55abad073040d969cb9bea5c";
 	private final String apiKey_lion = "ebe8dd8a9bb6217deaf297ff93f7a9afca312132";
+	private final String apiKey_gmail2 = "6b11f4402a04d69b3cbea7254c8f406df0398c6d";
 	private final String dynamoTableName = "tweets";
 	
 	private final String snsArn = "arn:aws:sns:us-east-1:455518163747:twitter-feed";
@@ -62,7 +63,7 @@ public class TweetWorker implements Runnable {
 		// hit up alchemy
 		boolean alchemySuccess = true;
 		try {
-			AlchemyAPI alchemy = AlchemyAPI.GetInstanceFromString(apiKey_gmail);
+			AlchemyAPI alchemy = AlchemyAPI.GetInstanceFromString(apiKey_gmail2);
 			Document doc = alchemy.TextGetTextSentiment(tweet.getString("text"));
 			if (doc != null) {
 				String sentimentType = doc.getElementsByTagName("type").item(0).getTextContent();
@@ -112,7 +113,7 @@ public class TweetWorker implements Runnable {
 	
 	private Map<String, AttributeValue> newItem(String timestamp, String tweet) {
         Map<String, AttributeValue> item = new HashMap<String, AttributeValue>();
-        item.put("id", new AttributeValue().withN(timestamp));
+        item.put("timestamp", new AttributeValue().withN(timestamp));
         item.put("tweet", new AttributeValue(tweet));
 
         return item;
@@ -133,11 +134,9 @@ public class TweetWorker implements Runnable {
 		//checkTweets();
 		boolean alchemySuccess = getSentiment();
 		if (alchemySuccess) {
-			System.out.println("Sending to Server");
-			sendSNSToServer(tweet);
-			// load into DB 
+			sendSNSToServer(tweet); 
 			System.out.println("Inserting Into DB");
-			//insertIntoDB();
+			insertIntoDB();
 		}
 	}
 

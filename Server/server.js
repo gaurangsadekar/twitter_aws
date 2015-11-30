@@ -28,8 +28,8 @@ var twit = new twitter ({
 
 var iosocket = null;
 aws.config.update({
-    accessKeyId: "AKIAIESDYWJIIGCD3YAA",
-    secretAccessKey: "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",
+    accessKeyId: "access key",
+    secretAccessKey: "secret key",
     region: 'us-east-1'
 });
 

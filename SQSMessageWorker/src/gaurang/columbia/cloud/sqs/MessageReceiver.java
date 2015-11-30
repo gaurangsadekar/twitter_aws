@@ -47,7 +47,7 @@ public class MessageReceiver {
 		return sqs;
 	}
 	
-	public static void processMessages (String queueName) throws JSONException {
+	public static void processMessages (String queueName) throws JSONException, InterruptedException {
 		String tweetQueueURL = sqs.getQueueUrl(queueName).getQueueUrl();
 
 		// Receive tweets from Queue
@@ -57,7 +57,7 @@ public class MessageReceiver {
 			ReceiveMessageRequest receiveMessageRequest = new ReceiveMessageRequest(tweetQueueURL)
 					.withMaxNumberOfMessages(maxNumberOfMessages);
 			List<Message> messages = sqs.receiveMessage(receiveMessageRequest).getMessages();
-			
+			Thread.sleep(2000);
 			if (!messages.isEmpty()) {
 				ExecutorService executor = Executors.newFixedThreadPool(maxNumberOfMessages);
 				for (Message message : messages) {
@@ -77,7 +77,7 @@ public class MessageReceiver {
 					executor.shutdownNow();
 					System.out.println("All threads forcefully shutdown");
 				}
-				//deleteQueueMessagesBatch(tweetQueueURL, messages);
+				deleteQueueMessagesBatch(tweetQueueURL, messages);
 			}
 			else {
 				System.out.println("No messages, sleep the thread");

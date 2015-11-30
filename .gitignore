@@ -19,3 +19,4 @@ RemoteSystemsTempFiles
 .classpath
 .recommenders
 node_modules
+node_credentials.txt
