@@ -1,46 +1,63 @@
 var express = require('express');
 var app = express();
 var router = express.Router();
-
-var twitter = require('twitter');
-var twit = new twitter ({
-  consumer_key: 'Akvjrwhus5ZWoOqBIZ3YwzBnj',
-  consumer_secret: 'fmyAfDeeY97sBevcs8rVdxR5K4CyHWQ7IgFuYFh80BQZus3SVP',
-  access_token_key: '4313326185-gR8yb25anRBjUfPkOLyrJURut2pbFuhKwi6ZjSw',
-  access_token_secret: 'DifijsWlsxsvf3CiixfVgGUK7n6nxAvn2j0XGfEOIYJHx'
-});
-
 var aws = require('aws-sdk');
-aws.config.update({
-  accessKeyId: "AKIAIG4OW4BCIMCVM4EQ",
-  secretAccessKey: "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",
-  region: 'us-east-1'
-});
-
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var twitter = require('twitter');
+var SNSClient = require('aws-snsclient');
+
+// Viral's Twitter Access
+// var twit = new twitter ({
+//   consumer_key: 'Akvjrwhus5ZWoOqBIZ3YwzBnj',
+//   consumer_secret: 'fmyAfDeeY97sBevcs8rVdxR5K4CyHWQ7IgFuYFh80BQZus3SVP',
+//   access_token_key: '4313326185-gR8yb25anRBjUfPkOLyrJURut2pbFuhKwi6ZjSw',
+//   access_token_secret: 'DifijsWlsxsvf3CiixfVgGUK7n6nxAvn2j0XGfEOIYJHx'
+// });
+
+// Gaurang's Twitter Access
+var twit = new twitter ({
+  consumer_key: 'CLbQDiBRjNn1NGEE0wJ2yNtxb',
+  consumer_secret: 'sJRdATSUzFWYJ1F2Ko28iLcWAQpYOsRjEX3EE0OoWW4XHoNGIl',
+  access_token_key: '140911269-fETxwkzza6f4n0MX1j6Saf7btgV7Vd1OBWdJKjVr',
+  access_token_secret: 'yOkNGkoOvtqtNre0L0rsNyYhhlIltkRWHz5sWVLFsmWFj'
+});
+
 var iosocket = null;
+aws.config.update({
+    accessKeyId: "AKIAIESDYWJIIGCD3YAA",
+    secretAccessKey: "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",
+    region: 'us-east-1'
+});
 
 app.use(express.static(__dirname + "/public"));
 
+var client = SNSClient(function(err, message) {
+    //console.log(message);
+    var tweet = JSON.parse(message.Message);
+    console.log(tweet.text);
+    iosocket.emit("mapdata", tweet)
+});
+
 app.post('/newtweet', function (req, res) {
-  var body = '';
-  req.on('data', function(data) {
-    body += data;
-  });
-
-  req.on('end', function() {
-    message = JSON.parse(body);
-    tweet = message['Message'];
-    json_tweet = JSON.parse(tweet);
-    iosocket.emit("mapdata", json_tweet);
-  });
-
-  res.status(200);
-  res.send('notification received');
+  client(req, res);
+  // var body = '';
+  // req.on('data', function(data) {
+  //   body += data;
+  // });
+  //
+  // req.on('end', function() {
+  //   message = JSON.parse(body);
+  //   tweet = message['Message'];
+  //   json_tweet = JSON.parse(tweet);
+  //   iosocket.emit("mapdata", json_tweet);
+  // });
+  //
+  // res.status(200);
+  // res.send('notification received');
 });
 
 function loadFromDynamo() {
